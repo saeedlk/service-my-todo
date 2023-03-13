@@ -1,0 +1,53 @@
+service: my-todo-app
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  # environment:
+  #   DYNAMODB_TODOTABLE_TABLE: ${self:service}-TodoTable-${sls:stage}
+  # iamRoleStatements:
+  #   - Effect: "Allow"
+  #     Action: 
+  #       - "dynamodb:PutItem"
+  #       - "dynamodb:Get*"
+  #       - "dynamodb:Scan*"
+  #       - "dynamodb:UpdateItem"
+  #       - "dynamodb:DeleteItem"
+  #     Resource: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-TodoTable-${sls:stage}
+
+functions:
+  index:
+    handler: src/index.handler
+    events:
+      - httpApi:
+          path: /
+          method: get
+      
+resources:
+  Resources:
+    TodoTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: TodoTable
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: i
+            AttributeType: S
+        KeySchema:
+          - AttributeName: i
+            KeyType: HASH
+
+# resources:
+#   Resources:
+#     TodoTable:
+#       Type: AWS::DynamoDB::Table
+#       Properties:
+#         KeySchema:
+#           - AttributeName: id
+#             KeyType: HASH
+#         TableName: TodoTable
+#         AttributeDefinitions:
+#           - AttributeName: id
+#             AttributeType: S
